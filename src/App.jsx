@@ -1,21 +1,24 @@
+import { useLenis } from './hooks/useLenis'
 import Nav from './components/Nav'
-import Cursor from './components/Cursor'
 import Hero from './components/Hero'
-import IntroLines from './components/IntroLines'
+import ScrollMarquee from './components/ScrollMarquee'
 import WorkSection from './components/WorkSection'
 import AboutSection from './components/AboutSection'
 import SkillsSection from './components/SkillsSection'
 import ContactSection from './components/ContactSection'
 import FloatingPlayer from './components/FloatingPlayer'
+import Cursor from './components/Cursor'
 import './App.css'
 
 function App() {
+  useLenis()
+
   return (
     <>
       <Nav />
       <main>
         <Hero />
-        <IntroLines />
+        <ScrollMarquee />
         <WorkSection />
         <AboutSection />
         <SkillsSection />
