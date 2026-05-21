@@ -1,4 +1,6 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, Suspense, lazy } from 'react'
+
+const HeroScene = lazy(() => import('./HeroScene'))
 
 export default function Hero() {
   const nameRef = useRef(null)
@@ -12,6 +14,9 @@ export default function Hero() {
 
   return (
     <section className="hero" id="hero">
+      <Suspense fallback={null}>
+        <HeroScene />
+      </Suspense>
       <div className="hero-content">
         <h1 className="hero-name" ref={nameRef}>
           <span>BASIA</span>

@@ -30,6 +30,44 @@ const allProjects = Object.entries(PROJECT_DATA).map(([id, data]) => ({
   cat: categoryMap[id] || 'other',
 }))
 
+function TiltCard({ children, onClick, onKeyDown, className, style }) {
+  const ref = useRef(null)
+
+  const onMove = e => {
+    const el = ref.current
+    if (!el?.classList.contains('visible')) return
+    const rect = el.getBoundingClientRect()
+    const x = (e.clientX - rect.left) / rect.width - 0.5
+    const y = (e.clientY - rect.top) / rect.height - 0.5
+    el.style.transform = `perspective(900px) rotateY(${x * 10}deg) rotateX(${-y * 7}deg) translateZ(10px)`
+    el.style.boxShadow = `${-x * 24}px ${y * 24}px 48px rgba(0,0,0,0.14)`
+    el.style.transition = 'transform 0.08s ease, box-shadow 0.08s ease'
+  }
+
+  const onLeave = () => {
+    const el = ref.current
+    el.style.transform = ''
+    el.style.boxShadow = ''
+    el.style.transition = 'transform 0.55s cubic-bezier(0.4,0,0.2,1), box-shadow 0.55s ease'
+  }
+
+  return (
+    <div
+      ref={ref}
+      className={className}
+      style={style}
+      onClick={onClick}
+      onKeyDown={onKeyDown}
+      onMouseMove={onMove}
+      onMouseLeave={onLeave}
+      role="button"
+      tabIndex={0}
+    >
+      {children}
+    </div>
+  )
+}
+
 export default function WorkSection() {
   const [active, setActive] = useState('all')
   const [selected, setSelected] = useState(null)
@@ -42,7 +80,6 @@ export default function WorkSection() {
   useEffect(() => {
     const cards = gridRef.current?.querySelectorAll('.project-card')
     if (!cards) return
-
     const obs = new IntersectionObserver(
       entries => {
         entries.forEach(entry => {
@@ -54,7 +91,6 @@ export default function WorkSection() {
       },
       { threshold: 0.08 }
     )
-
     cards.forEach(el => obs.observe(el))
     return () => obs.disconnect()
   }, [filtered])
@@ -80,13 +116,11 @@ export default function WorkSection() {
             const thumb = project.images?.[0] || null
             const catColor = catColors[project.cat] || '#888'
             return (
-              <div
+              <TiltCard
                 key={project.id}
                 className="project-card reveal"
                 style={{ transitionDelay: `${(i % 3) * 0.08}s` }}
                 onClick={() => setSelected(project)}
-                role="button"
-                tabIndex={0}
                 onKeyDown={e => e.key === 'Enter' && setSelected(project)}
               >
                 <div
@@ -105,7 +139,7 @@ export default function WorkSection() {
                     {catLabels[project.cat] || project.cat}
                   </div>
                 </div>
-              </div>
+              </TiltCard>
             )
           })}
         </div>

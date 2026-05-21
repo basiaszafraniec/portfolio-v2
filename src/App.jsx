@@ -1,4 +1,5 @@
 import Nav from './components/Nav'
+import Cursor from './components/Cursor'
 import Hero from './components/Hero'
 import IntroLines from './components/IntroLines'
 import WorkSection from './components/WorkSection'
@@ -21,6 +22,7 @@ function App() {
         <ContactSection />
       </main>
       <FloatingPlayer />
+      <Cursor />
     </>
   )
 }
