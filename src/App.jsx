@@ -1,7 +1,7 @@
 import { useLenis } from './hooks/useLenis'
 import Nav from './components/Nav'
 import Hero from './components/Hero'
-import ScrollMarquee from './components/ScrollMarquee'
+import IntroStatement from './components/IntroStatement'
 import WorkSection from './components/WorkSection'
 import AboutSection from './components/AboutSection'
 import SkillsSection from './components/SkillsSection'
@@ -18,7 +18,7 @@ function App() {
       <Nav />
       <main>
         <Hero />
-        <ScrollMarquee />
+        <IntroStatement />
         <WorkSection />
         <AboutSection />
         <SkillsSection />
