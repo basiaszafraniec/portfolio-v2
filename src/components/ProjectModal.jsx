@@ -1,73 +1,104 @@
 import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 
+const catColors = {
+  javascript: '#F59E0B',
+  python: '#38BDF8',
+  blender: '#F97316',
+  figma: '#8B5CF6',
+}
+
 export default function ProjectModal({ project, onClose }) {
   const [imgIdx, setImgIdx] = useState(0)
   const hasImages = project.images && project.images.length > 0
   const hasMultiple = hasImages && project.images.length > 1
+  const catColor = catColors[project.cat] || '#888'
 
   useEffect(() => {
     const onKey = e => { if (e.key === 'Escape') onClose() }
     document.addEventListener('keydown', onKey)
-    return () => document.removeEventListener('keydown', onKey)
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.removeEventListener('keydown', onKey)
+      document.body.style.overflow = prev
+    }
   }, [onClose])
 
-  const handleOverlay = e => {
-    if (e.target === e.currentTarget) onClose()
-  }
-
   return createPortal(
-    <div className="modal-overlay" onClick={handleOverlay}>
-      <div className="modal" role="dialog" aria-modal="true">
-        <div className="modal-header">
-          <h2 className="modal-title">{project.title}</h2>
-          <button className="modal-close" onClick={onClose} aria-label="Close">×</button>
+    <>
+      <div className="side-overlay" onClick={onClose} />
+
+      <div className="side-panel" role="dialog" aria-modal="true">
+        {/* Media area */}
+        <div className="panel-media">
+          {project.type === 'iframe' ? (
+            <iframe src={project.src} title={project.title} allowFullScreen />
+          ) : hasImages ? (
+            <img
+              key={imgIdx}
+              src={project.images[imgIdx]}
+              alt={`${project.title} ${imgIdx + 1}`}
+              className="panel-media-img"
+            />
+          ) : (
+            <div className="panel-no-img" style={{ background: catColor }} />
+          )}
+
+          {hasMultiple && (
+            <div className="panel-media-nav">
+              <button
+                className="pmn-btn"
+                onClick={() => setImgIdx(i => Math.max(0, i - 1))}
+                disabled={imgIdx === 0}
+              >←</button>
+              <span className="pmn-count">{imgIdx + 1} / {project.images.length}</span>
+              <button
+                className="pmn-btn"
+                onClick={() => setImgIdx(i => Math.min(project.images.length - 1, i + 1))}
+                disabled={imgIdx === project.images.length - 1}
+              >→</button>
+            </div>
+          )}
+
+          <button className="panel-close" onClick={onClose} aria-label="Close">✕</button>
         </div>
 
-        {project.type === 'iframe' ? (
-          <div className="modal-media">
-            <iframe src={project.src} title={project.title} allowFullScreen />
-          </div>
-        ) : hasImages ? (
-          <>
-            <div className="modal-media">
-              <img src={project.images[imgIdx]} alt={`${project.title} ${imgIdx + 1}`} />
-            </div>
-            {hasMultiple && (
-              <div className="modal-media-nav">
-                <button
-                  className="media-nav-btn"
-                  onClick={() => setImgIdx(i => Math.max(0, i - 1))}
-                  disabled={imgIdx === 0}
-                >← prev</button>
-                <span className="media-count">{imgIdx + 1} / {project.images.length}</span>
-                <button
-                  className="media-nav-btn"
-                  onClick={() => setImgIdx(i => Math.min(project.images.length - 1, i + 1))}
-                  disabled={imgIdx === project.images.length - 1}
-                >next →</button>
-              </div>
+        {/* Scrollable content */}
+        <div className="panel-body">
+          <div className="panel-heading">
+            <h2 className="panel-title">{project.title}</h2>
+            {project.cat && (
+              <span className="panel-cat" style={{ '--dot': catColor }}>
+                {project.cat.charAt(0).toUpperCase() + project.cat.slice(1)}
+              </span>
             )}
-          </>
-        ) : null}
-
-        <div className="modal-body">
-          <div className="modal-tags">
-            {project.stack?.map(s => <span key={s} className="tag stack">{s}</span>)}
-            {project.learned?.map(l => <span key={l} className="tag">{l}</span>)}
           </div>
-          {project.description && (
-            <p className="modal-desc">{project.description}</p>
+
+          {(project.stack?.length > 0 || project.learned?.length > 0) && (
+            <div className="panel-tags">
+              {project.stack?.map(s => (
+                <span key={s} className="tag stack">{s}</span>
+              ))}
+              {project.learned?.map(l => (
+                <span key={l} className="tag">{l}</span>
+              ))}
+            </div>
           )}
+
+          {project.description && (
+            <p className="panel-desc">{project.description}</p>
+          )}
+
           {(project.webLink || project.ghLink) && (
-            <div className="modal-links">
+            <div className="panel-links">
               {project.webLink && (
-                <a href={project.webLink} target="_blank" rel="noreferrer" className="modal-link primary">
+                <a href={project.webLink} target="_blank" rel="noreferrer" className="panel-link primary">
                   Visit site ↗
                 </a>
               )}
               {project.ghLink && (
-                <a href={project.ghLink} target="_blank" rel="noreferrer" className="modal-link secondary">
+                <a href={project.ghLink} target="_blank" rel="noreferrer" className="panel-link secondary">
                   GitHub ↗
                 </a>
               )}
@@ -75,7 +106,7 @@ export default function ProjectModal({ project, onClose }) {
           )}
         </div>
       </div>
-    </div>,
+    </>,
     document.body
   )
 }

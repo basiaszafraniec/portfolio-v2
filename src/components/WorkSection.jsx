@@ -25,77 +25,39 @@ const allProjects = Object.entries(PROJECT_DATA).map(([id, data]) => ({
   id, ...data, cat: categoryMap[id] || 'other',
 }))
 
-function GCard({ project, onClick, featured }) {
-  const cardRef = useRef(null)
-  const thumb = project.images?.[0] || null
-  const catColor = catColors[project.cat] || '#888'
-
-  useEffect(() => {
-    const el = cardRef.current
-    if (!el) return
-    const obs = new IntersectionObserver(([e]) => {
-      if (e.isIntersecting) { el.classList.add('visible'); obs.disconnect() }
-    }, { threshold: 0.08 })
-    obs.observe(el)
-    return () => obs.disconnect()
-  }, [])
-
-  const onMouseEnter = () => {
-    cardRef.current.style.transition = 'box-shadow 0.3s, opacity 0.7s, transform 0.7s'
-  }
-  const onMouseMove = (e) => {
-    const el = cardRef.current
-    const rect = el.getBoundingClientRect()
-    const x = ((e.clientX - rect.left) / rect.width - 0.5) * 10
-    const y = -((e.clientY - rect.top) / rect.height - 0.5) * 10
-    el.style.transition = 'box-shadow 0.3s'
-    el.style.transform = `perspective(900px) rotateX(${y}deg) rotateY(${x}deg) translateZ(6px)`
-  }
-  const onMouseLeave = () => {
-    const el = cardRef.current
-    el.style.transition = 'transform 0.45s ease, box-shadow 0.3s'
-    el.style.transform = ''
-    setTimeout(() => { if (el) el.style.transition = '' }, 450)
-  }
-
-  return (
-    <div
-      ref={cardRef}
-      className={`g-card reveal${featured ? ' featured' : ''}`}
-      onClick={onClick}
-      role="button"
-      tabIndex={0}
-      onKeyDown={e => e.key === 'Enter' && onClick()}
-      onMouseEnter={onMouseEnter}
-      onMouseMove={onMouseMove}
-      onMouseLeave={onMouseLeave}
-    >
-      {thumb ? (
-        <>
-          <img src={thumb} alt={project.title} className="g-card-img" />
-          <div className="g-card-overlay" />
-        </>
-      ) : (
-        <div className="g-card-placeholder" style={{ background: catColor }} />
-      )}
-      <div className="g-card-info">
-        <div className="g-card-title">{project.title}</div>
-        <div className="g-card-cat">
-          <span className="card-cat-dot" style={{ background: thumb ? 'rgba(255,255,255,0.55)' : 'rgba(0,0,0,0.35)' }} />
-          {catLabels[project.cat] || project.cat}
-        </div>
-      </div>
-    </div>
-  )
-}
-
 export default function WorkSection() {
   const [active, setActive] = useState('all')
   const [selected, setSelected] = useState(null)
+  const [hovered, setHovered] = useState(null)
+  const previewRef = useRef(null)
+  const mouseRef = useRef({ x: 0, y: 0 })
+  const posRef = useRef({ x: 0, y: 0 })
+  const rafRef = useRef(null)
 
-  const filtered = active === 'all'
-    ? allProjects
-    : allProjects.filter(p => p.cat === active)
+  const filtered = active === 'all' ? allProjects : allProjects.filter(p => p.cat === active)
+
+  useEffect(() => {
+    const onMove = e => { mouseRef.current = { x: e.clientX, y: e.clientY } }
+    window.addEventListener('mousemove', onMove)
+
+    const PREVIEW_W = 300
+    const loop = () => {
+      const tx = Math.min(mouseRef.current.x + 36, window.innerWidth - PREVIEW_W - 16)
+      const ty = mouseRef.current.y
+      posRef.current.x += (tx - posRef.current.x) * 0.13
+      posRef.current.y += (ty - posRef.current.y) * 0.13
+      if (previewRef.current) {
+        previewRef.current.style.left = `${posRef.current.x}px`
+        previewRef.current.style.top = `${posRef.current.y}px`
+      }
+      rafRef.current = requestAnimationFrame(loop)
+    }
+    rafRef.current = requestAnimationFrame(loop)
+    return () => {
+      window.removeEventListener('mousemove', onMove)
+      cancelAnimationFrame(rafRef.current)
+    }
+  }, [])
 
   return (
     <section className="work-section" id="work">
@@ -116,16 +78,43 @@ export default function WorkSection() {
           </div>
         </div>
 
-        <div className="project-grid">
-          {filtered.map((p, i) => (
-            <GCard
-              key={p.id}
-              project={p}
-              onClick={() => setSelected(p)}
-              featured={i % 3 === 2}
-            />
-          ))}
+        <div className="work-list">
+          {filtered.map((p, i) => {
+            const catColor = catColors[p.cat] || '#888'
+            return (
+              <div
+                key={p.id}
+                className="work-list-item"
+                onClick={() => setSelected(p)}
+                onMouseEnter={() => setHovered(p)}
+                onMouseLeave={() => setHovered(null)}
+                style={{ '--hover-color': catColor, animationDelay: `${i * 0.05}s` }}
+                role="button"
+                tabIndex={0}
+                onKeyDown={e => e.key === 'Enter' && setSelected(p)}
+              >
+                <span className="wl-num">{String(i + 1).padStart(2, '0')}</span>
+                <span className="wl-title">{p.title}</span>
+                <span className="wl-cat">{catLabels[p.cat] || p.cat}</span>
+                <span className="wl-arrow">↗</span>
+              </div>
+            )
+          })}
         </div>
+      </div>
+
+      <div
+        ref={previewRef}
+        className={`work-cursor-preview${hovered ? ' active' : ''}`}
+        aria-hidden="true"
+      >
+        {hovered && (
+          hovered.images?.[0]
+            ? <img src={hovered.images[0]} alt={hovered.title} />
+            : <div className="wcp-placeholder" style={{ background: catColors[hovered.cat] || '#1a1a1a' }}>
+                <span>{hovered.title}</span>
+              </div>
+        )}
       </div>
 
       {selected && (
