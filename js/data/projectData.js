@@ -16,7 +16,7 @@ export const PROJECT_DATA = {
         learned: ["working with public APIs", "dynamic UI updates"],
         description: "A simple little weather app that fetches data from a public API and displays the current weather for a searched location. In the little scene the weather conditions and charachter's outfit change based on the fetched data. The UI leaves a lot to be desired but my main goal was to just have some fun with APIs and dynamic data in React, as well as dip my toes in pixel art.",
         type: "image",
-        images: ["../assets/project-images/weather1.png", "../assets/project-images/weather2.png", "../assets/project-images/weather3.png"],
+        images: ["/assets/project-images/weather1.png", "/assets/project-images/weather2.png", "/assets/project-images/weather3.png"],
         webLink: "https://basiaszafraniec.github.io/weather-app/",
         ghLink: "https://github.com/basiaszafraniec/weather-app"
     },
@@ -27,7 +27,7 @@ export const PROJECT_DATA = {
         learned: ["working with a client", "Spline integration"],
         description: "A simple website I made for a local band called Strøm as one of my project in Multemedia Design course. I tried to add a little bit of fun to it while keeping it simple and informative. My work with the band wasn't limited to the website. I also worked on their social media, helped out with some editing and created some posters and flyers for their concerts.",
         type: "image",
-        images: ["../assets/project-images/strom1.png", "../assets/project-images/strom2.png", "../assets/project-images/strom3.png", "../assets/project-images/strom4.png", "../assets/project-images/strom5.png", "../assets/project-images/strom6.png", "../assets/project-images/strom7.png",   "../assets/project-images/strom8.png", "../assets/project-images/strom9.png", "../assets/project-images/strom10.png", "../assets/project-images/strom11.png"],
+        images: ["/assets/project-images/strom1.png", "/assets/project-images/strom2.png", "/assets/project-images/strom3.png", "/assets/project-images/strom4.png", "/assets/project-images/strom5.png", "/assets/project-images/strom6.png", "/assets/project-images/strom7.png", "/assets/project-images/strom8.png", "/assets/project-images/strom9.png", "/assets/project-images/strom10.png", "/assets/project-images/strom11.png"],
         ghLink: "https://github.com/basiaszafraniec/strom-band"
     },
 
