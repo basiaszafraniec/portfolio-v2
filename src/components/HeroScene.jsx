@@ -32,7 +32,7 @@ export default function HeroScene() {
       <Shape
         geometry={<torusKnotGeometry args={[1, 0.28, 80, 16]} />}
         position={[4.8, 0.5, -1]}
-        color="#8B5CF6"
+        color="#FF5C35"
         opacity={0.7}
         speed={0.7}
       />
@@ -40,7 +40,7 @@ export default function HeroScene() {
       <Shape
         geometry={<icosahedronGeometry args={[1.5, 0]} />}
         position={[-4.5, -1.2, -3]}
-        color="#8B5CF6"
+        color="#FF5C35"
         opacity={0.45}
         speed={0.5}
       />
